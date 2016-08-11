@@ -17,17 +17,31 @@ namespace BlackHole
         private bool allowSingleClickActions;
         private int currentChartIndex = -1;
         private string previousDirectory;
-        System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
+        private string currentWorkingDirectory;
+        private string bwCurrentAction;
+        private long runTimeInSeconds;
+        //System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
+        Timer timer = new Timer();
         BackgroundWorker bw;
         public Form1()
         {
             InitializeComponent();
+            lnkStopScan.Visible = false;
             bw = new BackgroundWorker();
             bw.DoWork += new DoWorkEventHandler(bw_DoWork);
             bw.ProgressChanged += new ProgressChangedEventHandler(bw_ProcessChanged);
             bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_Completed);
             bw.WorkerReportsProgress = true;
             bw.WorkerSupportsCancellation = true;
+            timer.Interval = 1000;
+            timer.Tick += new EventHandler(t_Tick);
+            //timer.Enabled = false;            
+            
+        }
+        void t_Tick(object sender, EventArgs e)
+        {
+            runTimeInSeconds++;
+            delTimerUpdate();
         }
 
         /*
@@ -35,36 +49,173 @@ namespace BlackHole
         */
         void bw_DoWork(object sender, DoWorkEventArgs e)
         {
+            timer.Enabled = true;
+            timer.Start();
+            if (bw.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
+            delLnkStopScanChange(true, true, "Stop Scanning");
             //Setup a loop through files and directories then call the directory size method
+            //Root Files
+#if DEBUG
+            log.Debug("Scanning for root files in " + currentWorkingDirectory);
+#endif
+            Int32 fileCount = 0;
+            List<FileFolderInfo> f = new List<FileFolderInfo>();
+            IEnumerable<string> subFiles = SafeWalk.EnumerateFiles(currentWorkingDirectory, "*", SearchOption.TopDirectoryOnly);
+            foreach (string file in subFiles)
+            {
+                if (bw.CancellationPending)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+                FileInfo fi = new FileInfo(file);
+                bwCurrentAction = "Scanning: " + fi.FullName;
+                bw.ReportProgress(0);
+                string extension = Path.GetExtension(file);
+                fileCount++;
+                f.Add(new FileFolderInfo { id = fileCount, name = fi.Name, size = fi.Length, type = "file", ext = extension, accessible = 1, subDirErrors = 0 });
+                bwAddFiles(fi);
+            }
+            //Directories and size
+            //Root Files
+#if DEBUG
+            log.Debug("Scanning directories in " + currentWorkingDirectory);
+#endif
+            string[] dirs = Directory.GetDirectories(currentWorkingDirectory);
+            foreach (string d in dirs)
+            {
+                if (bw.CancellationPending)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+                bwCurrentAction = "Scanning directory: " + d;
+                bw.ReportProgress(0);
+                Dictionary<long, int> dirSize = Enumerator.getDirectorySize(d);
+                bwAddDir(d, dirSize);
+                //id = fileCount, name = d, size = size, type = "dir", ext = "", accessible = 1, subDirErrors = 0 });
+            }
+
         }
         void bw_ProcessChanged(object sender, ProgressChangedEventArgs e)
         {
-            statusLbl.Text = e.ToString();
+            statusLbl.Text = bwCurrentAction;
+            dgEnumeratorManualSort("manual", 2, "Size", "ActualSize", ListSortDirection.Descending);
         }
         void bw_Completed(object sender, RunWorkerCompletedEventArgs e)
         {
+            timer.Enabled = false;
             timer.Stop();
+            string formattedTimer = Shared.secondsToMinutes(runTimeInSeconds);
             if (e.Cancelled)
             {
-                statusLbl.Text = "Task Cancelled";
-                log.Info("Drive enumartation cancelled");
+                statusLbl.Text = "Drive scan cancelled by user after " + formattedTimer;
+                log.Info("Drive enumartation cancelled by user " + formattedTimer);
             }
             else if (e.Error != null)
             {
-                statusLbl.Text = "Error while performing background operation " + timer.ElapsedMilliseconds;
-                log.Error("Error performing background operation");
+                statusLbl.Text = "Error while performing background operation after " + formattedTimer;
+                log.Error("Error performing background operation after " + formattedTimer, e.Error);
             }
             else
             {
                 statusLbl.Text = "Drive enumerated";
 #if DEBUG
-                log.Debug("Enumeration task completed after " + timer.ElapsedMilliseconds);
+                log.Debug("Enumeration task completed after " + formattedTimer);
 #endif
             }
             groupData.Enabled = true;
             groupTools.Enabled = true;
             groupData.Cursor = Cursors.Default;
             groupTools.Cursor = Cursors.Default;
+            lnkStopScan.Visible = false;
+        }
+        //Update UI from BackgroundWorker
+        private void bwAddFiles(FileInfo f)
+        {
+            if (this.dgEnumerator.InvokeRequired)
+                this.dgEnumerator.Invoke((MethodInvoker)delegate { this.AddFileToGrid(f); });
+            else
+                this.AddFileToGrid(f);
+        }
+        private void AddFileToGrid(FileInfo f)
+        {
+            int rowIndex;
+            Image icon;
+
+            try
+            {
+                icon = Shared.getIconForFileType(f.Extension);
+                //Color fontColor = (f.accessible == 1) ? Color.Black : Color.Red;
+                Color fontColor = Color.Black;
+                Dictionary<double, string> fileSize = Shared.sizeSuffix(f.Length);
+                var fileSizeItem = fileSize.First();
+                double roundFileSize = Shared.Ceil(fileSizeItem.Key, 2);
+                rowIndex = dgEnumerator.Rows.Add(icon, f.Name, roundFileSize + " " + fileSizeItem.Value, f.Length, f.Extension);
+                dgEnumerator.Rows[rowIndex].DefaultCellStyle.ForeColor = fontColor;
+                string tag = f.Name + "|0|B|1|B|0|B";
+                dgEnumerator.Rows[rowIndex].Tag = tag;
+            }
+            catch (System.UnauthorizedAccessException)
+            {
+                icon = Shared.getIconForFileType(".err");
+                rowIndex = dgEnumerator.Rows.Add(icon, f.Name, "0 bytes");
+                dgEnumerator.Rows[rowIndex].DefaultCellStyle.ForeColor = Color.Red;
+                string tag = f.Name + "|0|B|1|B|0|B";
+                dgEnumerator.Rows[rowIndex].Tag = tag;
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error A-12", ex);
+            }
+
+
+        }
+        //Update UI from BackgroundWorker
+        private void bwAddDir(string name, Dictionary<long, int> size)
+        {
+            if (this.dgEnumerator.InvokeRequired)
+                this.dgEnumerator.Invoke((MethodInvoker)delegate { this.AddDirToGrid(name, size); });
+            else
+                this.AddDirToGrid(name, size);
+        }
+        private void AddDirToGrid(string name, Dictionary<long, int> dirSize)
+        {
+            var dirSizeItem = dirSize.First();
+            long size = dirSizeItem.Key;
+            int rowIndex;
+            Image icon;
+            try
+            {
+                icon = Shared.getIconForFileType("dir");
+                //Color fontColor = (f.accessible == 1) ? Color.Black : Color.Red;
+                Color fontColor = Color.Black;
+                Dictionary<double, string> fileSize = Shared.sizeSuffix(size);
+                var fileSizeItem = fileSize.First();
+                double roundFileSize = Shared.Ceil(fileSizeItem.Key, 2);
+                rowIndex = dgEnumerator.Rows.Add(icon, name, roundFileSize + " " + fileSizeItem.Value, size, ".0dir");
+                dgEnumerator.Rows[rowIndex].DefaultCellStyle.ForeColor = fontColor;
+                string tag = name + "|0|B|1|B|0|B";
+                dgEnumerator.Rows[rowIndex].Tag = tag;
+            }
+            catch (System.UnauthorizedAccessException)
+            {
+                icon = Shared.getIconForFileType(".err");
+                rowIndex = dgEnumerator.Rows.Add(icon, name, "0 bytes");
+                dgEnumerator.Rows[rowIndex].DefaultCellStyle.ForeColor = Color.Red;
+                string tag = name + "|0|B|1|B|0|B";
+                dgEnumerator.Rows[rowIndex].Tag = tag;
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error A-12", ex);
+            }
+
+
         }
 
         /*
@@ -81,24 +232,33 @@ namespace BlackHole
         {
             dgEnumerator.Rows.Clear();
             dgEnumerator.Columns.Clear();
-            switch(type)
+            switch (type)
             {
                 case "drives":
                     dgEnumerator.Columns.Add("Drive", "Drive");
                     dgEnumerator.Columns.Add("FileSystem", "File System");
                     dgEnumerator.Columns.Add("Utilization", "Utilization");
-                    allowSingleClickActions = true;              
+                    allowSingleClickActions = true;
                     break;
                 case "enumerate":
                     DataGridViewImageColumn img = new DataGridViewImageColumn();
                     img.ImageLayout = DataGridViewImageCellLayout.Zoom;
                     img.Image = Properties.Resources.TXT;
-                    dgEnumerator.Columns.Add(img); 
+                    img.Name = "FileType";
+                    dgEnumerator.Columns.Add(img);
                     dgEnumerator.Columns.Add("Name", "Name");
                     dgEnumerator.Columns.Add("Size", "Size");
-                    
+                    dgEnumerator.Columns.Add("ActualSize", "ActualSize");
+                    dgEnumerator.Columns.Add("FileExt", "FileExt");
+                    dgEnumerator.Columns[3].Visible = false;
+                    dgEnumerator.Columns[4].Visible = false;
+                    //Set the Size and FileType columns to Programmatic sort.
+                    //Size colmun [2] will use the ActualSize column for sorting
+                    //FileType column [0] will use the FileExt columnt for sorting
+                    dgEnumerator.Columns[2].SortMode = DataGridViewColumnSortMode.Programmatic;
+                    dgEnumerator.Columns[0].SortMode = DataGridViewColumnSortMode.Programmatic;
                     allowSingleClickActions = false;
-                    break;          
+                    break;
             }
             lnkBack.Visible = false;
             dgEnumerator.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -111,7 +271,7 @@ namespace BlackHole
             if (drives != null)
             {
                 //No errors enumerating drives, add to grid
-                foreach(DriveInfo d in drives)
+                foreach (DriveInfo d in drives)
                 {
                     //Get used space
                     long usedSpaceLong = Convert.ToInt64(d.TotalSize) - Convert.ToInt64(d.AvailableFreeSpace);
@@ -127,7 +287,7 @@ namespace BlackHole
                     //Set variables with the key and val
                     double availableSpaceDec = Shared.Ceil(availableSpaceItem.Key, 2);
                     string availableSpaceSuffix = availableSpaceItem.Value;
-                    double totalSizeDec = Shared.Ceil(totalSizeItem.Key,2);
+                    double totalSizeDec = Shared.Ceil(totalSizeItem.Key, 2);
                     string totalSizeSuffix = totalSizeItem.Value;
                     double usedSpaceDec = Shared.Ceil(usedSpaceItem.Key, 2);
                     string usedSpaceSuffix = usedSpaceItem.Value;
@@ -135,7 +295,7 @@ namespace BlackHole
 
                     int rowIndex;
                     rowIndex = dgEnumerator.Rows.Add(d.Name + " " + d.VolumeLabel, d.DriveFormat, availableSpaceDec.ToString() + availableSpaceSuffix + " of " + totalSizeDec.ToString() + totalSizeSuffix);
-                    dgEnumerator.Rows[rowIndex].Tag = tag;        
+                    dgEnumerator.Rows[rowIndex].Tag = tag;
                 }
                 dgEnumerator.ClearSelection();
                 return 1;
@@ -155,7 +315,7 @@ namespace BlackHole
             string freeSpaceSuffix = tag[2];
             string totalSpaceSuffix = tag[4];
             string usedSpaceSuffix = tag[6];
-            updatePieChart(drive, totalSpaceDec, totalSpaceSuffix, freeSpaceDec, freeSpaceSuffix, usedSpaceDec, usedSpaceSuffix);        
+            updatePieChart(drive, totalSpaceDec, totalSpaceSuffix, freeSpaceDec, freeSpaceSuffix, usedSpaceDec, usedSpaceSuffix);
         }
 
         private void updatePieChart(string drive, double totalSpaceDec, string totalSpaceSuffix, double freeSpaceDec, string freeSpaceSuffix, double usedSpaceDec, string usedSpaceSuffix)
@@ -165,7 +325,7 @@ namespace BlackHole
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series
             {
                 Name = "Free Space",
-                IsVisibleInLegend = true,                                
+                IsVisibleInLegend = true,
                 ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Pie
             };
             double freePercentage = Shared.Ceil((double)freeSpaceDec / totalSpaceDec * 100, 0);
@@ -205,7 +365,7 @@ namespace BlackHole
         public void updateStatusBar(string text)
         {
             statusLbl.Text = text;
-        }       
+        }
 
         private void dgEnumerator_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -214,11 +374,13 @@ namespace BlackHole
             {
                 string[] tag = dgEnumerator.Rows[index].Tag.ToString().Split(new[] { '|' });
                 string path = tag[0];
+                currentWorkingDirectory = path;
                 taskWalkDirectory(path);
+                //bw.RunWorkerAsync();
                 //walkDirectory(path);                
             }
         }
-        
+
 
         private void dgEnumerator_CellClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -234,7 +396,6 @@ namespace BlackHole
         }
         private async Task taskWalkDirectory(string path)
         {
-            timer.Start();
             setupMainGrid("enumerate");
             try
             {
@@ -249,36 +410,38 @@ namespace BlackHole
                     previousDirectory = parent.FullName.ToString();
                     lnkBack.Text = "Up one directory";
                 }
-                
+
 #if DEBUG
                 log.Debug("Set parent directory to " + previousDirectory);
                 statusLbl.Text = previousDirectory;
 #endif
-                lnkBack.Visible = true;          
+                lnkBack.Visible = true;
             }
             catch (Exception ex)
             {
 #if DEBUG              
-                log.Debug("Error setting parent directory", ex);  
+                log.Debug("Error setting parent directory", ex);
                 statusLbl.Text = previousDirectory;
 #endif
                 previousDirectory = path;
                 log.Info("Error setting parent directory on " + path);
                 previousDirectory = null;
                 lnkBack.Visible = false;
-            }                      
+            }
+            /*                
             int walkTask = await Task.FromResult<int>(walkDirectory(path));
             if (walkTask == 0)
                 MessageBox.Show("Error enumerating directory structure.  Error has been logged to logs\\error-log.txt");
+            */
+            bw.RunWorkerAsync();
             groupTools.Enabled = true;
             groupData.Enabled = true;
             groupTools.Cursor = Cursors.Default;
             groupData.Cursor = Cursors.Default;
-            timer.Stop();
-            lblRunTime.Text = "Runtime: " + timer.ElapsedMilliseconds.ToString();
+            //lblRunTime.Text = "Runtime: " + timer.ElapsedMilliseconds.ToString();
         }
         //Background worker enumerator
-        private static void 
+
         private int walkDirectory(string dir)
         {
             try {
@@ -293,7 +456,7 @@ namespace BlackHole
                 List<FileFolderInfo> dirs = Enumerator.getDirectories(dir);
                 List<FileFolderInfo> files = Enumerator.getRootFiles(dir);
                 //need to loop through this
-                foreach(FileFolderInfo d in dirs)
+                foreach (FileFolderInfo d in dirs)
                 {
                     int rowIndex;
                     Image icon = icon = Properties.Resources.closed_folder;
@@ -309,7 +472,7 @@ namespace BlackHole
                     int rowIndex;
                     Image icon;
                     try {
-                        
+
                         if (f.type == "dir")
                         {
                             icon = Properties.Resources.closed_folder;
@@ -326,14 +489,14 @@ namespace BlackHole
                         string tag = f.name + "|0|B|1|B|0|B";
                         dgEnumerator.Rows[rowIndex].Tag = tag;
                     }
-                    catch(System.UnauthorizedAccessException)
+                    catch (System.UnauthorizedAccessException)
                     {
                         icon = Shared.getIconForFileType(".err");
                         rowIndex = dgEnumerator.Rows.Add(icon, f.name, "0 bytes");
                         dgEnumerator.Rows[rowIndex].DefaultCellStyle.ForeColor = Color.Red;
                         string tag = f.name + "|0|B|1|B|0|B";
                         dgEnumerator.Rows[rowIndex].Tag = tag;
-                    } catch(Exception ex)
+                    } catch (Exception ex)
                     {
                         log.Error("Error A-12", ex);
                     }
@@ -345,8 +508,8 @@ namespace BlackHole
             {
                 log.Error("Error walking directory " + dir, ex);
                 return 0;
-            }          
-            
+            }
+
         }
 
         private void lnkBack_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -374,6 +537,87 @@ namespace BlackHole
             {
                 if (lnkBack.Visible)
                     linkBack();
+            }
+        }
+        private void delTimerUpdate()
+        {
+            if (this.lblRunTime.InvokeRequired)
+                this.lblRunTime.Invoke((MethodInvoker)delegate { this.timerUpdate(); });
+            else
+                timerUpdate();
+        }
+        private void timerUpdate()
+        {
+            string formattedTimer = Shared.secondsToMinutes(runTimeInSeconds);
+            lblRunTime.Text = "Run Time: " + formattedTimer;
+        }
+
+        private void delLnkStopScanChange(bool visible, bool enabled, string text)
+        {
+            if (this.lnkStopScan.InvokeRequired)
+                this.lnkStopScan.Invoke((MethodInvoker)delegate { this.lnkStopScanChange(visible, enabled, text); });
+            else
+                this.lnkStopScanChange(visible, enabled, text);
+        }
+        private void lnkStopScanChange(bool visible, bool enabled, string text)
+        {
+            lnkStopScan.Visible = visible;
+            lnkStopScan.Enabled = enabled;
+            lnkStopScan.Text = text;
+        }
+
+        private void lnkStopScan_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            bw.CancelAsync();
+            lnkStopScan.Enabled = false;
+            lnkStopScan.Text = "Stopping...";
+        }       
+        
+        private void dgEnumeratorManualSort(string dir, int columnIndex, string columnName, string sortByColumnName, ListSortDirection defaultSort)
+        {
+            //Find out current sort order and reverse
+            DataGridViewColumn oldColumn = dgEnumerator.SortedColumn;
+            ListSortDirection sortDirection = defaultSort;          
+            if (dir == "auto")
+            {                
+                if (dgEnumerator.SortOrder == SortOrder.None)
+                {
+                    sortDirection = defaultSort;
+                }
+                if (dgEnumerator.SortOrder == SortOrder.Descending)
+                {
+                    sortDirection = ListSortDirection.Ascending;
+                }
+                else
+                {
+                    sortDirection = ListSortDirection.Descending;
+                }                
+            } else if (dir == "manual")
+            {
+                sortDirection = defaultSort;
+            }
+            try {
+                dgEnumerator.Sort(dgEnumerator.Columns[sortByColumnName], sortDirection);
+                dgEnumerator.Columns[columnIndex].HeaderCell.SortGlyphDirection = (sortDirection == ListSortDirection.Ascending) ? SortOrder.Ascending : SortOrder.Descending;
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error sorting column " + columnName + " at index " + columnIndex, ex);
+            }
+        } 
+
+        private void dgEnumerator_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            string columnName = dgEnumerator.Columns[e.ColumnIndex].Name.ToString();            
+            //If sort column is the Size column, use the hidden AcutalSize column to perform the sort.
+            //Cannot sort on Size column since it is a string with byte size appended
+            if (columnName == "Size")
+            {
+                dgEnumeratorManualSort("auto", e.ColumnIndex, columnName, "ActualSize", ListSortDirection.Descending);                
+            }
+            else if (columnName == "FileType")
+            {
+                dgEnumeratorManualSort("auto", e.ColumnIndex, columnName, "FileExt", ListSortDirection.Ascending);                
             }
         }
     }

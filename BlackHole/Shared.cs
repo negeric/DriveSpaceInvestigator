@@ -73,6 +73,9 @@ namespace BlackHole
                 case ".css":
                     img = Properties.Resources.CSS;
                     break;
+                case "dir":
+                    img = Properties.Resources.closed_folder;
+                    break;
                 case ".doc":
                     img = Properties.Resources.DOC;
                     break;
@@ -189,6 +192,12 @@ namespace BlackHole
                     break;
             }
             return img;
+        }
+        public static string secondsToMinutes(long s)
+        {
+            TimeSpan t = TimeSpan.FromSeconds(s);
+            string formatted = string.Format("{0:D2}h:{1:D2}m:{2:D2}s", t.Hours, t.Minutes, t.Seconds);
+            return formatted;
         }
     }
 

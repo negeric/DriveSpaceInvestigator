@@ -60,7 +60,7 @@ namespace BlackHole
                         log.Error("Skipping file " + file, ex);
                     }
                 }
-                f.Add(new FileFolderInfo { id = fileCount, name = d, size = size, type = "dor", ext = "", accessible = 1, subDirErrors = 0 });
+                f.Add(new FileFolderInfo { id = fileCount, name = d, size = size, type = "dir", ext = "", accessible = 1, subDirErrors = 0 });
             }
             
             return f;
@@ -191,7 +191,7 @@ namespace BlackHole
         }      
         */
         //Need to provide a way to loop through and ignore access denied errors
-        private static Dictionary<long,int> getDirectorySize(string dir)
+        public static Dictionary<long,int> getDirectorySize(string dir)
         {          
             long dirSize = 0;
             int failed = 0;
@@ -224,7 +224,11 @@ namespace BlackHole
                 //Calculate old fashioned way
                 dirSize = getDirectorySizeLegacy(dir);
                 ret.Add(dirSize, 1);
-            }            
+            } catch (Exception e)
+            {
+                log.Info("We ran into an issue on a file in " + dir + ".  Skipping this file and logging more details to the error-log.  Reference ID AD-14");
+                log.Error("Unknown error [AD-14], see inner exception", e);
+            }       
             return ret;
         }       
 

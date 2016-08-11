@@ -35,38 +35,39 @@
             this.lblActionTitle = new System.Windows.Forms.Label();
             this.panelHeader = new System.Windows.Forms.Panel();
             this.txtIconStartSpacer = new System.Windows.Forms.TextBox();
-            this.txtStartSettingsSpacer = new System.Windows.Forms.TextBox();
-            this.lblAppTitle = new System.Windows.Forms.Label();
-            this.pnlApp = new System.Windows.Forms.Panel();
+            this.pictureAppStart = new System.Windows.Forms.PictureBox();
             this.pnlCurrentDisk = new System.Windows.Forms.Panel();
-            this.chartDriveUsage = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.statusLbl = new System.Windows.Forms.ToolStripStatusLabel();
+            this.txtStartSettingsSpacer = new System.Windows.Forms.TextBox();
+            this.pictureAppSettings = new System.Windows.Forms.PictureBox();
+            this.lblAppTitle = new System.Windows.Forms.Label();
+            this.pictureAppLogo = new System.Windows.Forms.PictureBox();
+            this.pnlApp = new System.Windows.Forms.Panel();
+            this.groupStatus = new System.Windows.Forms.GroupBox();
+            this.lblItem = new System.Windows.Forms.Label();
+            this.lblCurrentStatus = new System.Windows.Forms.Label();
+            this.lblRunTime = new System.Windows.Forms.Label();
+            this.groupData = new System.Windows.Forms.GroupBox();
+            this.groupDriveInfo = new System.Windows.Forms.GroupBox();
+            this.lblFreeDriveSpace = new System.Windows.Forms.Label();
             this.lblTotalDriveSpace = new System.Windows.Forms.Label();
             this.lblUsedDriveSpace = new System.Windows.Forms.Label();
-            this.lblFreeDriveSpace = new System.Windows.Forms.Label();
+            this.chartDriveUsage = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.groupTools = new System.Windows.Forms.GroupBox();
-            this.groupDriveInfo = new System.Windows.Forms.GroupBox();
-            this.groupData = new System.Windows.Forms.GroupBox();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.statusLbl = new System.Windows.Forms.ToolStripStatusLabel();
             this.lnkBack = new System.Windows.Forms.LinkLabel();
-            this.pictureAppStart = new System.Windows.Forms.PictureBox();
-            this.pictureAppSettings = new System.Windows.Forms.PictureBox();
-            this.pictureAppLogo = new System.Windows.Forms.PictureBox();
-            this.groupStatus = new System.Windows.Forms.GroupBox();
-            this.lblRunTime = new System.Windows.Forms.Label();
-            this.lblCurrentStatus = new System.Windows.Forms.Label();
-            this.lblItem = new System.Windows.Forms.Label();
+            this.lnkStopScan = new System.Windows.Forms.LinkLabel();
             ((System.ComponentModel.ISupportInitialize)(this.dgEnumerator)).BeginInit();
             this.panelHeader.SuspendLayout();
-            this.pnlApp.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chartDriveUsage)).BeginInit();
-            this.statusStrip1.SuspendLayout();
-            this.groupDriveInfo.SuspendLayout();
-            this.groupData.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureAppStart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureAppSettings)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureAppLogo)).BeginInit();
+            this.pnlApp.SuspendLayout();
             this.groupStatus.SuspendLayout();
+            this.groupData.SuspendLayout();
+            this.groupDriveInfo.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartDriveUsage)).BeginInit();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // dgEnumerator
@@ -88,6 +89,7 @@
             this.dgEnumerator.TabIndex = 0;
             this.dgEnumerator.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgEnumerator_CellClick);
             this.dgEnumerator.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgEnumerator_CellDoubleClick);
+            this.dgEnumerator.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgEnumerator_ColumnHeaderMouseClick);
             this.dgEnumerator.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
             // 
             // lblActionTitle
@@ -128,6 +130,25 @@
             this.txtIconStartSpacer.Size = new System.Drawing.Size(1, 100);
             this.txtIconStartSpacer.TabIndex = 5;
             // 
+            // pictureAppStart
+            // 
+            this.pictureAppStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.pictureAppStart.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pictureAppStart.Image = global::BlackHole.Properties.Resources.search_icon;
+            this.pictureAppStart.Location = new System.Drawing.Point(782, 0);
+            this.pictureAppStart.Name = "pictureAppStart";
+            this.pictureAppStart.Size = new System.Drawing.Size(100, 100);
+            this.pictureAppStart.TabIndex = 4;
+            this.pictureAppStart.TabStop = false;
+            // 
+            // pnlCurrentDisk
+            // 
+            this.pnlCurrentDisk.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pnlCurrentDisk.Location = new System.Drawing.Point(300, 106);
+            this.pnlCurrentDisk.Name = "pnlCurrentDisk";
+            this.pnlCurrentDisk.Size = new System.Drawing.Size(217, 223);
+            this.pnlCurrentDisk.TabIndex = 1;
+            // 
             // txtStartSettingsSpacer
             // 
             this.txtStartSettingsSpacer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -137,6 +158,17 @@
             this.txtStartSettingsSpacer.Name = "txtStartSettingsSpacer";
             this.txtStartSettingsSpacer.Size = new System.Drawing.Size(1, 100);
             this.txtStartSettingsSpacer.TabIndex = 3;
+            // 
+            // pictureAppSettings
+            // 
+            this.pictureAppSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.pictureAppSettings.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pictureAppSettings.Image = global::BlackHole.Properties.Resources.settings_icon;
+            this.pictureAppSettings.Location = new System.Drawing.Point(883, 0);
+            this.pictureAppSettings.Name = "pictureAppSettings";
+            this.pictureAppSettings.Size = new System.Drawing.Size(100, 100);
+            this.pictureAppSettings.TabIndex = 2;
+            this.pictureAppSettings.TabStop = false;
             // 
             // lblAppTitle
             // 
@@ -149,6 +181,16 @@
             this.lblAppTitle.TabIndex = 1;
             this.lblAppTitle.Text = "Drive Space Investigator";
             this.lblAppTitle.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
+            // 
+            // pictureAppLogo
+            // 
+            this.pictureAppLogo.Image = global::BlackHole.Properties.Resources.atom_icon;
+            this.pictureAppLogo.Location = new System.Drawing.Point(11, 4);
+            this.pictureAppLogo.Name = "pictureAppLogo";
+            this.pictureAppLogo.Size = new System.Drawing.Size(98, 92);
+            this.pictureAppLogo.TabIndex = 0;
+            this.pictureAppLogo.TabStop = false;
+            this.pictureAppLogo.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
             // 
             // pnlApp
             // 
@@ -166,13 +208,95 @@
             this.pnlApp.TabIndex = 3;
             this.pnlApp.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
             // 
-            // pnlCurrentDisk
+            // groupStatus
             // 
-            this.pnlCurrentDisk.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlCurrentDisk.Location = new System.Drawing.Point(300, 106);
-            this.pnlCurrentDisk.Name = "pnlCurrentDisk";
-            this.pnlCurrentDisk.Size = new System.Drawing.Size(217, 223);
-            this.pnlCurrentDisk.TabIndex = 1;
+            this.groupStatus.Controls.Add(this.lblItem);
+            this.groupStatus.Controls.Add(this.lblCurrentStatus);
+            this.groupStatus.Controls.Add(this.lblRunTime);
+            this.groupStatus.Location = new System.Drawing.Point(3, 361);
+            this.groupStatus.Name = "groupStatus";
+            this.groupStatus.Size = new System.Drawing.Size(217, 75);
+            this.groupStatus.TabIndex = 5;
+            this.groupStatus.TabStop = false;
+            this.groupStatus.Text = "Status";
+            // 
+            // lblItem
+            // 
+            this.lblItem.AutoSize = true;
+            this.lblItem.Location = new System.Drawing.Point(7, 54);
+            this.lblItem.Name = "lblItem";
+            this.lblItem.Size = new System.Drawing.Size(30, 13);
+            this.lblItem.TabIndex = 2;
+            this.lblItem.Text = "Item:";
+            // 
+            // lblCurrentStatus
+            // 
+            this.lblCurrentStatus.AutoSize = true;
+            this.lblCurrentStatus.Location = new System.Drawing.Point(7, 20);
+            this.lblCurrentStatus.Name = "lblCurrentStatus";
+            this.lblCurrentStatus.Size = new System.Drawing.Size(60, 13);
+            this.lblCurrentStatus.TabIndex = 1;
+            this.lblCurrentStatus.Text = "Status: Idle";
+            // 
+            // lblRunTime
+            // 
+            this.lblRunTime.AutoSize = true;
+            this.lblRunTime.Location = new System.Drawing.Point(7, 37);
+            this.lblRunTime.Name = "lblRunTime";
+            this.lblRunTime.Size = new System.Drawing.Size(65, 13);
+            this.lblRunTime.TabIndex = 0;
+            this.lblRunTime.Text = "Run Time: 0";
+            // 
+            // groupData
+            // 
+            this.groupData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupData.Controls.Add(this.dgEnumerator);
+            this.groupData.Location = new System.Drawing.Point(227, 4);
+            this.groupData.Name = "groupData";
+            this.groupData.Size = new System.Drawing.Size(756, 438);
+            this.groupData.TabIndex = 4;
+            this.groupData.TabStop = false;
+            this.groupData.Text = "Select a Drive";
+            // 
+            // groupDriveInfo
+            // 
+            this.groupDriveInfo.Controls.Add(this.lblFreeDriveSpace);
+            this.groupDriveInfo.Controls.Add(this.lblTotalDriveSpace);
+            this.groupDriveInfo.Controls.Add(this.lblUsedDriveSpace);
+            this.groupDriveInfo.Controls.Add(this.chartDriveUsage);
+            this.groupDriveInfo.Location = new System.Drawing.Point(3, 3);
+            this.groupDriveInfo.Name = "groupDriveInfo";
+            this.groupDriveInfo.Size = new System.Drawing.Size(217, 223);
+            this.groupDriveInfo.TabIndex = 3;
+            this.groupDriveInfo.TabStop = false;
+            this.groupDriveInfo.Text = "Drive Info";
+            // 
+            // lblFreeDriveSpace
+            // 
+            this.lblFreeDriveSpace.AutoSize = true;
+            this.lblFreeDriveSpace.Location = new System.Drawing.Point(7, 207);
+            this.lblFreeDriveSpace.Name = "lblFreeDriveSpace";
+            this.lblFreeDriveSpace.Size = new System.Drawing.Size(130, 13);
+            this.lblFreeDriveSpace.TabIndex = 6;
+            this.lblFreeDriveSpace.Text = "Select a Drive to continue";
+            // 
+            // lblTotalDriveSpace
+            // 
+            this.lblTotalDriveSpace.AutoSize = true;
+            this.lblTotalDriveSpace.Location = new System.Drawing.Point(7, 170);
+            this.lblTotalDriveSpace.Name = "lblTotalDriveSpace";
+            this.lblTotalDriveSpace.Size = new System.Drawing.Size(0, 13);
+            this.lblTotalDriveSpace.TabIndex = 4;
+            // 
+            // lblUsedDriveSpace
+            // 
+            this.lblUsedDriveSpace.AutoSize = true;
+            this.lblUsedDriveSpace.Location = new System.Drawing.Point(7, 188);
+            this.lblUsedDriveSpace.Name = "lblUsedDriveSpace";
+            this.lblUsedDriveSpace.Size = new System.Drawing.Size(0, 13);
+            this.lblUsedDriveSpace.TabIndex = 5;
             // 
             // chartDriveUsage
             // 
@@ -197,6 +321,15 @@
             this.chartDriveUsage.Text = "chart1";
             this.chartDriveUsage.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
             // 
+            // groupTools
+            // 
+            this.groupTools.Location = new System.Drawing.Point(3, 232);
+            this.groupTools.Name = "groupTools";
+            this.groupTools.Size = new System.Drawing.Size(217, 123);
+            this.groupTools.TabIndex = 2;
+            this.groupTools.TabStop = false;
+            this.groupTools.Text = "Tools";
+            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -213,66 +346,6 @@
             this.statusLbl.Size = new System.Drawing.Size(118, 17);
             this.statusLbl.Text = "toolStripStatusLabel1";
             // 
-            // lblTotalDriveSpace
-            // 
-            this.lblTotalDriveSpace.AutoSize = true;
-            this.lblTotalDriveSpace.Location = new System.Drawing.Point(7, 170);
-            this.lblTotalDriveSpace.Name = "lblTotalDriveSpace";
-            this.lblTotalDriveSpace.Size = new System.Drawing.Size(0, 13);
-            this.lblTotalDriveSpace.TabIndex = 4;
-            // 
-            // lblUsedDriveSpace
-            // 
-            this.lblUsedDriveSpace.AutoSize = true;
-            this.lblUsedDriveSpace.Location = new System.Drawing.Point(7, 188);
-            this.lblUsedDriveSpace.Name = "lblUsedDriveSpace";
-            this.lblUsedDriveSpace.Size = new System.Drawing.Size(0, 13);
-            this.lblUsedDriveSpace.TabIndex = 5;
-            // 
-            // lblFreeDriveSpace
-            // 
-            this.lblFreeDriveSpace.AutoSize = true;
-            this.lblFreeDriveSpace.Location = new System.Drawing.Point(7, 207);
-            this.lblFreeDriveSpace.Name = "lblFreeDriveSpace";
-            this.lblFreeDriveSpace.Size = new System.Drawing.Size(130, 13);
-            this.lblFreeDriveSpace.TabIndex = 6;
-            this.lblFreeDriveSpace.Text = "Select a Drive to continue";
-            // 
-            // groupTools
-            // 
-            this.groupTools.Location = new System.Drawing.Point(3, 232);
-            this.groupTools.Name = "groupTools";
-            this.groupTools.Size = new System.Drawing.Size(217, 123);
-            this.groupTools.TabIndex = 2;
-            this.groupTools.TabStop = false;
-            this.groupTools.Text = "Tools";
-            // 
-            // groupDriveInfo
-            // 
-            this.groupDriveInfo.Controls.Add(this.lblFreeDriveSpace);
-            this.groupDriveInfo.Controls.Add(this.lblTotalDriveSpace);
-            this.groupDriveInfo.Controls.Add(this.lblUsedDriveSpace);
-            this.groupDriveInfo.Controls.Add(this.chartDriveUsage);
-            this.groupDriveInfo.Location = new System.Drawing.Point(3, 3);
-            this.groupDriveInfo.Name = "groupDriveInfo";
-            this.groupDriveInfo.Size = new System.Drawing.Size(217, 223);
-            this.groupDriveInfo.TabIndex = 3;
-            this.groupDriveInfo.TabStop = false;
-            this.groupDriveInfo.Text = "Drive Info";
-            // 
-            // groupData
-            // 
-            this.groupData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupData.Controls.Add(this.dgEnumerator);
-            this.groupData.Location = new System.Drawing.Point(227, 4);
-            this.groupData.Name = "groupData";
-            this.groupData.Size = new System.Drawing.Size(756, 438);
-            this.groupData.TabIndex = 4;
-            this.groupData.TabStop = false;
-            this.groupData.Text = "Select a Drive";
-            // 
             // lnkBack
             // 
             this.lnkBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -285,82 +358,24 @@
             this.lnkBack.Text = "Up one directory";
             this.lnkBack.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkBack_LinkClicked);
             // 
-            // pictureAppStart
+            // lnkStopScan
             // 
-            this.pictureAppStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureAppStart.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pictureAppStart.Image = global::BlackHole.Properties.Resources.search_icon;
-            this.pictureAppStart.Location = new System.Drawing.Point(782, 0);
-            this.pictureAppStart.Name = "pictureAppStart";
-            this.pictureAppStart.Size = new System.Drawing.Size(100, 100);
-            this.pictureAppStart.TabIndex = 4;
-            this.pictureAppStart.TabStop = false;
-            // 
-            // pictureAppSettings
-            // 
-            this.pictureAppSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureAppSettings.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.pictureAppSettings.Image = global::BlackHole.Properties.Resources.settings_icon;
-            this.pictureAppSettings.Location = new System.Drawing.Point(883, 0);
-            this.pictureAppSettings.Name = "pictureAppSettings";
-            this.pictureAppSettings.Size = new System.Drawing.Size(100, 100);
-            this.pictureAppSettings.TabIndex = 2;
-            this.pictureAppSettings.TabStop = false;
-            // 
-            // pictureAppLogo
-            // 
-            this.pictureAppLogo.Image = global::BlackHole.Properties.Resources.atom_icon;
-            this.pictureAppLogo.Location = new System.Drawing.Point(11, 4);
-            this.pictureAppLogo.Name = "pictureAppLogo";
-            this.pictureAppLogo.Size = new System.Drawing.Size(98, 92);
-            this.pictureAppLogo.TabIndex = 0;
-            this.pictureAppLogo.TabStop = false;
-            this.pictureAppLogo.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseDown);
-            // 
-            // groupStatus
-            // 
-            this.groupStatus.Controls.Add(this.lblItem);
-            this.groupStatus.Controls.Add(this.lblCurrentStatus);
-            this.groupStatus.Controls.Add(this.lblRunTime);
-            this.groupStatus.Location = new System.Drawing.Point(3, 361);
-            this.groupStatus.Name = "groupStatus";
-            this.groupStatus.Size = new System.Drawing.Size(217, 75);
-            this.groupStatus.TabIndex = 5;
-            this.groupStatus.TabStop = false;
-            this.groupStatus.Text = "Status";
-            // 
-            // lblRunTime
-            // 
-            this.lblRunTime.AutoSize = true;
-            this.lblRunTime.Location = new System.Drawing.Point(7, 37);
-            this.lblRunTime.Name = "lblRunTime";
-            this.lblRunTime.Size = new System.Drawing.Size(65, 13);
-            this.lblRunTime.TabIndex = 0;
-            this.lblRunTime.Text = "Run Time: 0";
-            // 
-            // lblCurrentStatus
-            // 
-            this.lblCurrentStatus.AutoSize = true;
-            this.lblCurrentStatus.Location = new System.Drawing.Point(7, 20);
-            this.lblCurrentStatus.Name = "lblCurrentStatus";
-            this.lblCurrentStatus.Size = new System.Drawing.Size(60, 13);
-            this.lblCurrentStatus.TabIndex = 1;
-            this.lblCurrentStatus.Text = "Status: Idle";
-            // 
-            // lblItem
-            // 
-            this.lblItem.AutoSize = true;
-            this.lblItem.Location = new System.Drawing.Point(7, 54);
-            this.lblItem.Name = "lblItem";
-            this.lblItem.Size = new System.Drawing.Size(30, 13);
-            this.lblItem.TabIndex = 2;
-            this.lblItem.Text = "Item:";
+            this.lnkStopScan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lnkStopScan.AutoSize = true;
+            this.lnkStopScan.Location = new System.Drawing.Point(805, 115);
+            this.lnkStopScan.Name = "lnkStopScan";
+            this.lnkStopScan.Size = new System.Drawing.Size(77, 13);
+            this.lnkStopScan.TabIndex = 6;
+            this.lnkStopScan.TabStop = true;
+            this.lnkStopScan.Text = "Stop Scanning";
+            this.lnkStopScan.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkStopScan_LinkClicked);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(984, 611);
+            this.Controls.Add(this.lnkStopScan);
             this.Controls.Add(this.lnkBack);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.pnlApp);
@@ -373,18 +388,18 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgEnumerator)).EndInit();
             this.panelHeader.ResumeLayout(false);
             this.panelHeader.PerformLayout();
-            this.pnlApp.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.chartDriveUsage)).EndInit();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
-            this.groupDriveInfo.ResumeLayout(false);
-            this.groupDriveInfo.PerformLayout();
-            this.groupData.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureAppStart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureAppSettings)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureAppLogo)).EndInit();
+            this.pnlApp.ResumeLayout(false);
             this.groupStatus.ResumeLayout(false);
             this.groupStatus.PerformLayout();
+            this.groupData.ResumeLayout(false);
+            this.groupDriveInfo.ResumeLayout(false);
+            this.groupDriveInfo.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chartDriveUsage)).EndInit();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -417,6 +432,7 @@
         private System.Windows.Forms.Label lblItem;
         private System.Windows.Forms.Label lblCurrentStatus;
         private System.Windows.Forms.Label lblRunTime;
+        private System.Windows.Forms.LinkLabel lnkStopScan;
     }
 }
 
