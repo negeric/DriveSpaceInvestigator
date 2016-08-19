@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.dgEnumerator = new System.Windows.Forms.DataGridView();
             this.lblActionTitle = new System.Windows.Forms.Label();
             this.panelHeader = new System.Windows.Forms.Panel();
@@ -47,6 +47,8 @@
             this.lblCurrentStatus = new System.Windows.Forms.Label();
             this.lblRunTime = new System.Windows.Forms.Label();
             this.groupData = new System.Windows.Forms.GroupBox();
+            this.btnManulScan = new System.Windows.Forms.Button();
+            this.txtManualScan = new System.Windows.Forms.TextBox();
             this.groupDriveInfo = new System.Windows.Forms.GroupBox();
             this.lblFreeDriveSpace = new System.Windows.Forms.Label();
             this.lblTotalDriveSpace = new System.Windows.Forms.Label();
@@ -85,7 +87,7 @@
             this.dgEnumerator.Name = "dgEnumerator";
             this.dgEnumerator.ReadOnly = true;
             this.dgEnumerator.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgEnumerator.Size = new System.Drawing.Size(744, 414);
+            this.dgEnumerator.Size = new System.Drawing.Size(744, 382);
             this.dgEnumerator.TabIndex = 0;
             this.dgEnumerator.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgEnumerator_CellClick);
             this.dgEnumerator.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgEnumerator_CellDoubleClick);
@@ -252,13 +254,35 @@
             this.groupData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupData.Controls.Add(this.btnManulScan);
+            this.groupData.Controls.Add(this.txtManualScan);
             this.groupData.Controls.Add(this.dgEnumerator);
             this.groupData.Location = new System.Drawing.Point(227, 4);
             this.groupData.Name = "groupData";
-            this.groupData.Size = new System.Drawing.Size(756, 438);
+            this.groupData.Size = new System.Drawing.Size(756, 432);
             this.groupData.TabIndex = 4;
             this.groupData.TabStop = false;
             this.groupData.Text = "Select a Drive";
+            // 
+            // btnManulScan
+            // 
+            this.btnManulScan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnManulScan.Location = new System.Drawing.Point(675, 404);
+            this.btnManulScan.Name = "btnManulScan";
+            this.btnManulScan.Size = new System.Drawing.Size(75, 23);
+            this.btnManulScan.TabIndex = 2;
+            this.btnManulScan.Text = "Scan";
+            this.btnManulScan.UseVisualStyleBackColor = true;
+            this.btnManulScan.Click += new System.EventHandler(this.btnManulScan_Click);
+            // 
+            // txtManualScan
+            // 
+            this.txtManualScan.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtManualScan.Location = new System.Drawing.Point(6, 406);
+            this.txtManualScan.Name = "txtManualScan";
+            this.txtManualScan.Size = new System.Drawing.Size(665, 20);
+            this.txtManualScan.TabIndex = 1;
             // 
             // groupDriveInfo
             // 
@@ -303,19 +327,19 @@
             this.chartDriveUsage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            chartArea1.Name = "ChartArea1";
-            this.chartDriveUsage.ChartAreas.Add(chartArea1);
-            legend1.Alignment = System.Drawing.StringAlignment.Center;
-            legend1.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            legend1.Name = "Legend1";
-            this.chartDriveUsage.Legends.Add(legend1);
+            chartArea2.Name = "ChartArea1";
+            this.chartDriveUsage.ChartAreas.Add(chartArea2);
+            legend2.Alignment = System.Drawing.StringAlignment.Center;
+            legend2.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            legend2.Name = "Legend1";
+            this.chartDriveUsage.Legends.Add(legend2);
             this.chartDriveUsage.Location = new System.Drawing.Point(7, 19);
             this.chartDriveUsage.Name = "chartDriveUsage";
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Pie;
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chartDriveUsage.Series.Add(series1);
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Pie;
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.chartDriveUsage.Series.Add(series2);
             this.chartDriveUsage.Size = new System.Drawing.Size(204, 162);
             this.chartDriveUsage.TabIndex = 3;
             this.chartDriveUsage.Text = "chart1";
@@ -395,6 +419,7 @@
             this.groupStatus.ResumeLayout(false);
             this.groupStatus.PerformLayout();
             this.groupData.ResumeLayout(false);
+            this.groupData.PerformLayout();
             this.groupDriveInfo.ResumeLayout(false);
             this.groupDriveInfo.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartDriveUsage)).EndInit();
@@ -433,6 +458,8 @@
         private System.Windows.Forms.Label lblCurrentStatus;
         private System.Windows.Forms.Label lblRunTime;
         private System.Windows.Forms.LinkLabel lnkStopScan;
+        private System.Windows.Forms.Button btnManulScan;
+        private System.Windows.Forms.TextBox txtManualScan;
     }
 }
 

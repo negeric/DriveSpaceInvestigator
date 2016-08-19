@@ -62,23 +62,51 @@ namespace BlackHole
 #if DEBUG
             log.Debug("Scanning for root files in " + currentWorkingDirectory);
 #endif
-            Int32 fileCount = 0;
-            List<FileFolderInfo> f = new List<FileFolderInfo>();
-            IEnumerable<string> subFiles = SafeWalk.EnumerateFiles(currentWorkingDirectory, "*", SearchOption.TopDirectoryOnly);
-            foreach (string file in subFiles)
-            {
-                if (bw.CancellationPending)
+            try {
+                Int32 fileCount = 0;
+                List<FileFolderInfo> f = new List<FileFolderInfo>();
+                IEnumerable<string> subFiles = SafeWalk.EnumerateFiles(currentWorkingDirectory, "*", SearchOption.TopDirectoryOnly);
+                foreach (string file in subFiles)
                 {
-                    e.Cancel = true;
-                    return;
+                    if (bw.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                    try
+                    {
+                        FileInfo fi = new FileInfo(file);
+                        bwCurrentAction = "Scanning: " + fi.FullName;
+                        bw.ReportProgress(0);
+                        string extension = Path.GetExtension(file);
+                        fileCount++;
+                        try {
+                            f.Add(new FileFolderInfo { id = fileCount, name = fi.Name, size = fi.Length, type = "file", ext = extension, accessible = 1, subDirErrors = 0 });
+
+                            bwAddFiles(fi);
+                        }
+                        catch (Exception ex)
+                        {
+                            log.Error("Error looking up information for file " + file, ex);
+                        }
+                    }
+                    catch (UnauthorizedAccessException uex)
+                    {
+                        //fileCount++;
+                        log.Info("Access denied on file " + file + ".  See error log and referece [AD-154]");
+                        log.Error("Error AD-154", uex);
+                    }
+                    catch (Exception ex) {
+                        log.Info("Unknown error occurred on file " + file + ".  See error log and reference [UE-154]");
+                        log.Error("Error UE-154", ex);
+                    }
+
                 }
-                FileInfo fi = new FileInfo(file);
-                bwCurrentAction = "Scanning: " + fi.FullName;
-                bw.ReportProgress(0);
-                string extension = Path.GetExtension(file);
-                fileCount++;
-                f.Add(new FileFolderInfo { id = fileCount, name = fi.Name, size = fi.Length, type = "file", ext = extension, accessible = 1, subDirErrors = 0 });
-                bwAddFiles(fi);
+            }
+            catch (Exception ex)
+            {
+                log.Info("Unknown error occurect.  See error log and reference [UE-155]");
+                log.Error("Error UE-155", ex);
             }
             //Directories and size
             //Root Files
@@ -128,6 +156,8 @@ namespace BlackHole
                 log.Debug("Enumeration task completed after " + formattedTimer);
 #endif
             }
+            txtManualScan.Enabled = true;
+            btnManulScan.Enabled = true;
             groupData.Enabled = true;
             groupTools.Enabled = true;
             groupData.Cursor = Cursors.Default;
@@ -178,10 +208,25 @@ namespace BlackHole
         //Update UI from BackgroundWorker
         private void bwAddDir(string name, Dictionary<long, int> size)
         {
-            if (this.dgEnumerator.InvokeRequired)
-                this.dgEnumerator.Invoke((MethodInvoker)delegate { this.AddDirToGrid(name, size); });
-            else
-                this.AddDirToGrid(name, size);
+            try {
+                if (this.dgEnumerator.InvokeRequired)
+                    this.dgEnumerator.Invoke((MethodInvoker)delegate { this.AddDirToGrid(name, size); });
+                else
+                    this.AddDirToGrid(name, size);
+            }
+            catch (Exception e)
+            {
+                log.Error("Error adding " + name + " to datagrid.  Trying to force this.  Look for error DG-1 to see if this succeeded.", e);
+                try
+                {
+                    this.AddDirToGrid(name, size);
+                    log.Error("Error [DG-1].  We were able to force " + name + " into the datagrid");
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Error [DG-1] adding " + name + " to datagrid", ex); 
+                }
+            }
         }
         private void AddDirToGrid(string name, Dictionary<long, int> dirSize)
         {
@@ -224,6 +269,7 @@ namespace BlackHole
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            //this.Icon = Properties.Resources.atom_icon;
             log.Debug("App Starting");
             lblActionTitle.Text = "Loading...";
             listDrivesAsync();
@@ -375,6 +421,7 @@ namespace BlackHole
                 string[] tag = dgEnumerator.Rows[index].Tag.ToString().Split(new[] { '|' });
                 string path = tag[0];
                 currentWorkingDirectory = path;
+                txtManualScan.Text = path;
                 taskWalkDirectory(path);
                 //bw.RunWorkerAsync();
                 //walkDirectory(path);                
@@ -394,7 +441,7 @@ namespace BlackHole
                 }
             }
         }
-        private async Task taskWalkDirectory(string path)
+        private void taskWalkDirectory(string path)
         {
             setupMainGrid("enumerate");
             try
@@ -433,6 +480,8 @@ namespace BlackHole
             if (walkTask == 0)
                 MessageBox.Show("Error enumerating directory structure.  Error has been logged to logs\\error-log.txt");
             */
+            txtManualScan.Enabled = false;
+            btnManulScan.Enabled = false;
             bw.RunWorkerAsync();
             groupTools.Enabled = true;
             groupData.Enabled = true;
@@ -618,6 +667,26 @@ namespace BlackHole
             else if (columnName == "FileType")
             {
                 dgEnumeratorManualSort("auto", e.ColumnIndex, columnName, "FileExt", ListSortDirection.Ascending);                
+            }
+        }
+
+        private void btnManulScan_Click(object sender, EventArgs e)
+        {
+            string manualDir = @txtManualScan.Text;
+            if (Directory.Exists(manualDir))
+            {
+#if DEBUG
+                log.Debug("Starting manual scan of " + manualDir);
+#endif
+                setupMainGrid("enumerate");
+                currentWorkingDirectory = manualDir;
+                taskWalkDirectory(manualDir);
+            }
+            else
+            {
+                statusLbl.Text = "Error: directory does not eixst";
+                MessageBox.Show("Error: The specified directory does not exist");
+                log.Info("Error on Manual Scan: The specified directory does not exist. [" + manualDir + "]");
             }
         }
     }

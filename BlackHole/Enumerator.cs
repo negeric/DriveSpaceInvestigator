@@ -241,8 +241,15 @@ namespace BlackHole
             List<string> files = recursiveDirSearchLegacy(dir);
             foreach(string f in files)
             {
-                FileInfo fInfo = new FileInfo(f);
-                dirSize += fInfo.Length;
+                try {
+                    FileInfo fInfo = new FileInfo(f);
+                    dirSize += fInfo.Length;
+                }
+                catch (Exception e)
+                {
+                    log.Info("We ran into an issue on a file in " + dir + ".  Skipping this file and logging more details to the error-log.  Reference ID UE-17");
+                    log.Error("Unknown error [UE-17], see inner exception", e);
+                }
             }
             return dirSize;
         }
@@ -272,6 +279,7 @@ namespace BlackHole
     }
     public static class SafeWalk
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public static IEnumerable<string> EnumerateFiles(string path, string searchPattern, SearchOption searchOpt)
         {
             try
@@ -284,10 +292,17 @@ namespace BlackHole
                 }
                 return dirFiles.Concat(Directory.EnumerateFiles(path, searchPattern));
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException uex)
             {
+                log.Error("Unauthorized error", uex);
                 return Enumerable.Empty<string>();
             }
+            catch (Exception ex)
+            {
+                log.Error("Unkown error in safeWalk", ex);
+                return Enumerable.Empty<string>();
+            }
+
         }
     }
 }
